@@ -496,77 +496,8 @@
      ((and (null? l1) (null? l2)) #t)
      ((and (atom? (car l1)) (atom? (car l2)))
       (cond
-       ((and (eq? (car l1) (car l2)) (eqlist? (cdr l1) (cdr l2))) #t)
+       ((and (eq? (car l1) (car l2)) (eqlist? (cdr l2) (cdr l2))) #t)
        (else #f)))
-     ((or (atom? (car l1)) (atom? (car l2))) #f)
-     (else (and (eqlist? (car l1) (car l2))
-                (eqlist? (cdr l1) (cdr l2)))))))
-
-(define eqlist?
-  (lambda (l1 l2)
-    (cond
-     ((and (null? l1) (null? l2)) #t)
-     ((or (null? l1) (null? l2)) #f)
-     ((and (atom? (car l1)) (atom? (car l2)))
-      (and (eq? (car l1) (car l2)) (eqlist? (cdr l1) (cdr l2))))
-     ((or (atom? (car l1)) (atom? (car l2))) #f)
-     (else (and (eqlist? (car l1) (car l2))
-                (eqlist? (cdr l1) (cdr l2)))))))
-
-(eqlist? '(a e c) '(a e c))
-(eqlist? '(b e c) '(a e c))
-(eqlist? '((a) e c) '((a) e c))
-(eqlist? '((a) e c) '(a e c))
-(eqlist? '((a c) e c) '((a b) e c))
-(eqlist? '(() e c) '((a b) e c))
-(eqlist? '(() e c) '(() e c))
-
-(define equal?
-  (lambda (l1 l2)
-    (cond
-     ((and (atom? l1) (atom? l2)) (eq? l1 l2))
-     ((or (atom? l1) (atom? l2)) #f)
-     (else (eqlist? l1 l2)))))
-(equal? '((1) e c) '(() e c))
-(equal? '(() e c) '(() e c))
-(equal? '(1 2 3 4) '(1 2 3 4))
-(equal? '() 'a)
-(equal? 'a 'a)
-
-(define rember
-  (lambda (s l)
-    (cond
-     ((null? l) '())
-     ((equal? s (car l)) (rember s (cdr l)))
-     (else (cons (car l) (rember s (cdr l)))))))
-
-(rember '(a) '((a) b c))
-(rember 'a '(a b c))
-(rember '() '(a b c))
-
-(define numbered?
-  (lambda (aexp)
-    (cond
-     ((atom? aexp) (number? aexp))
-     ((eq? (car (cdr aexp)) '+)
-      (and (numbered? (car aexp))
-           (numbered? (cdr (cdr aexp)))))
-     ((eq? (car (cdr aexp)) '*)
-      (and (numbered? (car aexp))
-           (numbered? (cdr (cdr aexp)))))
-     ((eq? (car (cdr aexp)) '^)
-      (and (numbered? (car aexp))
-           (numbered? (cdr (cdr aexp)))))
      (else #f))))
 
-
-(define numbered?
-  (lambda (aexp)
-    (cond
-     ((atom? aexp) (number? aexp))
-     (else
-      (and (numbered? (car aexp))
-           (numbered? (car (cdr (cdr aexp)))))))))
-
-(numbered? '(1 + 2))
-(numbered? '(1 + (1 + 2)))
+(eq? '(a e c) '(a e c))
