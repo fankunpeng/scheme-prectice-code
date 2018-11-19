@@ -355,3 +355,128 @@
 (rember* 'a '((a) b a (a c) d))
 (rember* 'a '(() b a (a c) (c a) d))
 
+
+(define occur*
+  (lambda (a l)
+    (cond
+     ((null? l) 0)
+     ((atom? (car l))
+      (cond
+       ((eq? (car l) a)
+        (add1 (occur* a (cdr l))))
+       (else (occur* a (cdr l)))))
+     (else
+      (cond
+       ((null? (car l)) (occur* a (cdr l)))
+       ((eq? (car (car l)) a)
+        (+ (add1 (occur* a (cdr (car l))))
+           (occur* a (cdr l))))
+       (else (+ (occur* a (cdr (car l)))
+                (occur* a (cdr l)))))))))
+
+(occur* 'a '(a b c))
+(occur* 'a '((a b) a c))
+(occur* 'a '((a b) () a c))
+(occur* 'a '((a b) (b a a c) a c))
+
+(define subst*
+  (lambda (new old l)
+    (cond
+     ((null? l) '())
+     ((atom? (car l))
+      (cond
+       ((eq? old (car l)) (cons new (subst* new old (cdr l))))
+       (else (cons (car l) (subst* new old (cdr l))))))
+     (else
+      (cond
+       ((null? (car l))
+        (cons (car l)
+              (subst* new old (cdr l))))
+       ((eq? (car (car l)) old)
+        (cons (cons new
+                    (subst* new old(cdr (car l))))
+              (subst* new old (cdr l))))
+       (else (cons (cons (car (car l))
+                         (subst* new old (cdr (car l))))
+                   (subst* new old (cdr l)))))))))
+
+(subst* 'e 'a '((a b) (b a a c) a c))
+(subst* 'e 'a '((a b a c ) a (b a a c a) a c))
+(subst* 'e 'a '((a a a) a () a c))
+
+(define insertL*
+  (lambda (new old l)
+    (cond
+     ((null? l) '())
+     ((atom? (car l))
+      (cond
+       ((eq? (car l) old)
+        (cons new (cons (car l) (insertL* new old (cdr l)))))
+       (else (cons (car l) (insertL* new old (cdr l))))))
+     (else
+      (cond
+       ((null? (car l))
+        (cons (car l) (insertL* new old (cdr l))))
+       ((eq? (car (car l)) old)
+        (cons
+         (cons new
+               (cons (car (car l))
+                     (insertL* new old (cdr (car l)))))
+         (insertL* new old (cdr l))))
+       (else
+        (cons
+         (cons (car (car l))
+               (insertL* new old (cdr (car l))))
+         (insertL* new old (cdr l)))))))))
+
+(define insertL*
+  (lambda (new old l)
+    (cond
+     ((null? l) '())
+     ((atom? (car l))
+      (cond
+       ((eq? (car l) old)
+        (cons new
+              (cons old
+                    (insertL* new old (cdr l)))))
+       (else
+        (cons (car l)
+              (insertL* new old (cdr l))))))
+     (else
+      (cond
+       ((null? (car l)) '())
+       ((eq? (car (car l)) old)
+        (cons
+         (cons new
+               (cons old
+                     (insertL* new old (cdr (car l)))))
+         (insertL* new old (cdr l))))
+       (else
+        (cons
+         (cons (car (car l))
+               (insertL* new old (cdr (car l))))
+         (insertL* new old (cdr l)))))))))
+
+(insertL* 'e 'a '((a (a) a a) a () a c))
+(insertL* 'e 'a '((a (a (c a)) a a) a () a c))
+
+(define member* 
+  (lambda (a l)
+    (cond
+     ((null? l) #f)
+     ((atom? (car l))
+      (cond
+       ((eq? (car l) a) #t)
+       (else (member* a (cdr l)))))
+     (else
+      (cond
+       ((null? (car l)) #f)
+       ((eq? (car (car l)) a) #t)
+       (else (or (member* a (cdr l))
+                  (member* a (cdr (car l))))))))))
+
+(member* 'a '((a (a (c a)) a a) a () a c))
+(member* 'a '((a (a (c a)) a a) a () a c))
+(member* 'a '((e b e c) e (b e e c e) e c))
+(member* 'a '(a))
+
