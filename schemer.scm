@@ -570,3 +570,65 @@
 
 (numbered? '(1 + 2))
 (numbered? '(1 + (1 + 2)))
+
+
+(define set?
+  (lambda (lat)
+    (cond
+     ((null? lat) #t)
+     ((zero? (occur (car lat) (cdr lat)))
+      (set? (cdr lat)))
+     (else #f)))))
+
+(define set?
+  (lambda (lat)
+    (cond
+     ((null? lat) #t)
+     ((member? (car lat) (cdr lat)) #f)
+     (else (set? (cdr lat))))))
+
+(occur '1 '(2 1 3))
+(set? '(1 1 3 4))
+(set? '(1 3 1 4))
+(set? '(1 3 2 4))
+
+(define makeset
+  (lambda (lat)
+    (cond
+     ((null? lat) lat)
+     ((member? (car lat) (cdr lat)) (makeset (cdr lat)))
+     (else (cons (car lat) (makeset (cdr lat)))))))
+
+(makeset '(1 2 3 4 1 2 4))
+(makeset '(1 2 3 4))
+
+(define makeset
+  (lambda (lat)
+    (cond
+     ((null? lat) '())
+     (else (cons (car lat)
+                 (makeset (multiremember (car lat) (cdr lat))))))))
+
+(multiremember '1 '(1 2 3 4 1 2 4))
+(makeset '(1 2 3 4 1 2 4))
+(makeset '(1 2 3 4))
+
+(define subset?
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) #t)
+     ((member? (car set1) set2)
+      (subset? (cdr set1) (cdr set2)))
+     (else #f))))
+
+(define subset?
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) #t)
+     (else (and (member? (car set1) set2)
+                (subset? (cdr set2) set2))))))
+
+(subset? '(1 2 5) '(1 2 3 4))
+(subset? '(1 2 ) '(1 2 3 4))
+(subset? '(1 2 ) '(1 2 3 4))
+
