@@ -747,3 +747,62 @@
 (a-pair? '(1 ))
 (a-pair? '(1 2 '()))
 (a-pair? '1)
+
+
+(define first
+  (lambda (p)
+    (cond
+     (else (car p)))))
+
+(define second
+  (lambda (p)
+    (cond
+     (else (car (cdr p))))))
+
+(define build
+  (lambda (s1 s2)
+    (cond
+     (else (cons s1
+                 (cons s2 '()))))))
+
+(build 'a 'b)
+(build '() '())
+
+(define third
+  (lambda (l)
+    (car (cdr (cdr l)))))
+
+(third (build '() '()))
+
+(define fun?
+  (lambda (rel)
+    (set? (firsts rel))))
+
+(fun? '((a b) (c d)))
+(fun? '((a b) (a d)))
+
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else (cons (cons (car (cdr (car rel)))
+                       (cons (car (car rel)) '()))
+                 (revrel (cdr rel)))))))
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else (cons (build (car (cdr (car rel)))
+                        (car (car rel)))
+                 (revrel (cdr rel)))))))
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else (cons (build (second (car rel))
+                        (first (car rel)))
+                 (revrel (cdr rel)))))))
+
+(revrel '((a b) (c d)))
+(revrel '((a b) (c d) (e f)))
+
