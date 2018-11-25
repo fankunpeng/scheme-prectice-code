@@ -803,6 +803,39 @@
                         (first (car rel)))
                  (revrel (cdr rel)))))))
 
+(define revpair
+  (lambda (p)
+    (build (second p) (first p))))
+(revpair '(a b))
+
+(define revrel
+  (lambda (rel)
+    (cond
+     ((null? rel) '())
+     (else (cons (revpair (car rel))
+                  (revrel (cdr rel)))))))
+
 (revrel '((a b) (c d)))
 (revrel '((a b) (c d) (e f)))
+
+(define seconds
+  (lambda (l)
+    (cond
+     ((null? l) '())
+     (else (cons (second (car l))
+                 (seconds (cdr l)))))))
+(seconds '((a b) (c d) (e f)))
+
+(define fullfun?
+  (lambda (fun)
+    (set? (seconds fun))))
+
+(fullfun? '((a b) (c d) (e f)))
+(fullfun? '((a b) (c d) (e b)))
+
+(define one-to-one?
+  (lambda (fun)
+    (fun? (revrel fun))))
+(one-to-one? '((a b) (c d) (e f)))
+(one-to-one? '((a b) (c d) (e b)))
 
