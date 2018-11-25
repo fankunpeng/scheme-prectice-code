@@ -578,7 +578,7 @@
      ((null? lat) #t)
      ((zero? (occur (car lat) (cdr lat)))
       (set? (cdr lat)))
-     (else #f)))))
+     (else #f))))
 
 (define set?
   (lambda (lat)
@@ -626,9 +626,124 @@
     (cond
      ((null? set1) #t)
      (else (and (member? (car set1) set2)
-                (subset? (cdr set2) set2))))))
+                (subset? (cdr set1) set2))))))
 
 (subset? '(1 2 5) '(1 2 3 4))
 (subset? '(1 2 ) '(1 2 3 4))
 (subset? '(1 2 ) '(1 2 3 4))
 
+
+(define eqset?
+  (lambda (set1 set2)
+    (cond
+     ((and (null? set1)
+           (null? set2)) #t)
+     ((or (null? set1)
+          (null? set2)) #f)
+     (else (member? (car set1) set2)
+           (eqset? (cdr set1)
+                   (remember (car set1)
+                             set2))))))
+
+(define subset?
+  (lambda (set1 set2)
+    (cond
+     ((and (subset? set1 set2)
+           (subset? set2 set1)) #t)
+     (else #f))))
+
+(define subset?
+  (lambda (set1 set2)
+    (and (subset? set1 set2)
+         (subset? set2 set1))))
+
+(eqset? '(1 2 3 4) '(1 2 3 4))
+(eqset? '(2 3 4 1) '(1 2 3 4))
+(eqset? '(2 3 4 5) '(1 2 3 4))
+(eqset? '(1 2 3) '(1 2 3 4))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+     ((or (null? set1)
+          (null? set2)) #f)
+     ((member? (car set1) set2) #t)
+     (else (intersect? (cdr set1)
+                       set2)))))
+
+(define intersect?
+  (lambda (set1 set2)
+    (cond
+     ((or (null? set1)
+          (null? set2)) #f)
+     (else (or (member? (car set1) set2)
+               (intersect? (cdr set1) set2))))))
+
+(intersect? '(1 2 3 4) '(1 2 3 4))
+(intersect? '(2) '(1 2 3 4))
+(intersect? '() '(1 2 3 4))
+(intersect? '(5) '(1 2 3 4))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+     ((intersect? set1 set2)
+      (cond
+       ((null? set1) '())
+       ((member? (car set1) set2)
+        (cons (car set1)
+              (intersect (cdr set1) set2)))
+       (else (intersect (cdr set1) set2))))
+     (else '()))))
+
+(define intersect
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) '())
+     ((member? (car set1) set2)
+      (cons (car set1)
+            (intersect (cdr set1) set2)))
+     (else (intersect (cdr set1) set2)))))
+
+(intersect '(2) '(1 2 3 4))
+(intersect '() '(1 2 3 4))
+(intersect '(3 5 7) '(1 2 3 4))
+(intersect '(5 6 7) '(1 2 3 4))
+
+
+(define union
+  (lambda (set1 set2)
+    (cond
+     ((null? set1) set2)
+     ((member? (car set1) set2)
+      (union (cdr set1) set2))
+     (else (cons (car set1)
+                 (union (cdr set1) set2))))))
+(union '(5 6 7) '(1 2 3 4))
+(union '(4 5 6 7) '(1 2 3 4))
+(union '(4) '(1 2 3 4))
+
+(define intersectall
+  (lambda (l-set)
+    (cond
+     ((null? (cdr l-set)) (car l-set))
+     (else (intersect (car l-set)
+                      (intersectall (cdr l-set)))))))
+
+(intersectall '((4) (1 2 3 4)))
+(intersectall '((4) (2 4) (1 2 3 4)))
+(intersectall '((4) (4) (1 2 3 4)))
+
+(define a-pair?
+  (lambda (x)
+    (cond
+     ((null? x) #f)
+     ((atom? x) #f)
+     ((null? (cdr x)) #f)
+     ((null? (cdr (cdr x))) #t)
+     (else #f))))
+
+(a-pair? '(1 2))
+(a-pair? '(1 ))
+(a-pair? '(1 2 '()))
+(a-pair? '1)
