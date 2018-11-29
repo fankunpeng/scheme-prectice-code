@@ -772,7 +772,6 @@
   (lambda (l)
     (car (cdr (cdr l)))))
 
-(third (build '() '()))
 
 (define fun?
   (lambda (rel)
@@ -839,3 +838,83 @@
 (one-to-one? '((a b) (c d) (e f)))
 (one-to-one? '((a b) (c d) (e b)))
 
+(define rember-f
+  (lambda (test? a l)
+    (cond
+     ((null? l) '())
+     ((test? a (car l)) (cdr l))
+     (else (cons (car l)
+                 (rember-f test? a (cdr l)))))))
+(rember-f = 5 '(6 2 5 3))
+(rember-f eq? 'jelly '(jelly beans are good))
+(rember-f equal? '(jelly) '((jelly) beans are good))
+
+(define eq?-c
+  (lambda (a)
+    (lambda (x)
+      (eq? a x))))
+
+((eq?-c 'hello) 'hello)
+(define eq?-scala (eq?-c 'scala))
+(eq?-scala 'scala)
+
+(define rember-f
+  (lambda (test?)
+    (lambda (a l)
+      (cond
+       ((null? l) '())
+       ((test? (car l) a)
+        (cdr l))
+       (else (cons (car l)
+                   ((rember-f test?) a (cdr l))))))))
+
+((rember-f =) 5 '(6 2 5 3))
+((rember-f eq?) 'jelly '(jelly beans are good))
+((rember-f equal?) '(jelly) '((jelly) beans are good))
+((rember-f eq?) 'eq? '(equal? eq? equan? eqlist? eqpair?))
+
+(define insertL-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((test? old (car l))
+        (cons new
+              (cons (car l) (cdr l))))
+       (else (cons (car l)
+                   ((insertL-f test?) new old (cdr l))))))))
+((insertL-f =) 1 6 '(1 2 3 4 5 6))
+
+(define insertR-f
+  (lambda (test?)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((test? (car l) old)
+        (cons (car l)
+              (cons new (cdr l))))
+       (else (cons (car l)
+                   ((insertR-f test?) new old (cdr l))))))))
+((insertR-f =) 1 6 '(1 2 3 4 5 6))
+
+(define seqL
+  (lambda (new old l)
+    (cons new (cons old l))))
+
+(define seqR
+  (lambda (new old l)
+    (cons old
+          (cons new l))))
+
+(define insert-g
+  (lambda (seq)
+    (lambda (new old l)
+      (cond
+       ((null? l) '())
+       ((eq? (car l) old)
+        (seq new old ((insert-g seq) (cdr l))))
+       (else (cons (car l)
+                   ((insert-g seq) new old (cdr l))))))))
+
+((insert-g seqL) 1 6 '(1 2 3 6 4 5 6))
+((insert-g seqR) 1 6 '(1 2 3 6 4 5 6))
