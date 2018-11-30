@@ -206,3 +206,23 @@
                                              (make-point 1 4))))
 (print-point (midpoint-segment (make-segment (make-point 4 2)
                                              (make-point 1 4))))
+
+(define cons
+  (lambda (x y)
+    (lambda (m)
+      (cond
+       ((= m 0) x)
+       ((= m 1) y)
+       (else (error "error argument" m))))))
+
+(define car
+  (lambda (z)
+    (z 0)))
+
+(define cdr
+  (lambda (z)
+    (z 1)))
+
+(car (cons 1 2))
+(cdr (cons 1 2))
+(define z (cons 3 4))
