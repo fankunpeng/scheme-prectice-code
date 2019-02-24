@@ -918,3 +918,13 @@
 
 ((insert-g seqL) 1 6 '(1 2 3 6 4 5 6))
 ((insert-g seqR) 1 6 '(1 2 3 6 4 5 6))
+
+
+(define rember-f
+  (lambda (test? a l)
+    (cond
+     ((null? l) '())
+     ((test? (car l) a) (cdr l))
+     (else (cons (car l)
+		 (rember-f test? a (cdr l)))))))
+
